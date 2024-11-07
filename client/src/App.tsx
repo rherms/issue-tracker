@@ -1,5 +1,6 @@
 import axios from 'axios';
 import './App.css';
+import { Button, ChakraProvider } from '@chakra-ui/react';
 import { Priority, Status } from './const';
 
 const TEST_ISSUE = {
@@ -11,7 +12,7 @@ const TEST_ISSUE = {
 
 // data will be the string we send from our server
 const apiCall = () => {
-  axios.post('http://localhost:8080/create', TEST_ISSUE).then((data) => {
+  axios.post('http://localhost:8080/create', TEST_ISSUE).then((data: any) => {
     // this console.log will be in our frontend console
     console.log(data);
   });
@@ -19,11 +20,13 @@ const apiCall = () => {
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <button onClick={apiCall}>Make API Call</button>
-      </header>
-    </div>
+    <ChakraProvider>
+      <div className="App">
+        <header className="App-header">
+          <Button onClick={apiCall}>Make API Call</Button>
+        </header>
+      </div>
+    </ChakraProvider>
   );
 }
 
