@@ -5,5 +5,5 @@ interface IssuesListProps {
 }
 
 export const IssuesList = React.memo(function IssuesList(props: IssuesListProps) {
-  return null;
+  return <div>{JSON.stringify(props.issueIds)}</div>;
 });
