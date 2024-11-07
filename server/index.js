@@ -29,7 +29,7 @@ const ALL_ISSUES_BY_ID = {};
 
 /**
  * Request shape:
- * just title, description, status, and priority of issue
+ * just title, description, and priority of issue
  * Response is the created issue
  */
 app.post('/create', (req, res) => {
@@ -38,6 +38,7 @@ app.post('/create', (req, res) => {
   issue.id = crypto.randomUUID();
   issue.createTimestampMs = Date.now();
   issue.lastUpdatedTimestampMs = Date.now();
+  issue.status = 'Open';
   ALL_ISSUES_BY_ID[issue.id] = issue;
   res.send(issue);
 });

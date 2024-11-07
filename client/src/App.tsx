@@ -1,8 +1,8 @@
 import './App.css';
-import { Button, ChakraProvider, Spinner, Heading } from '@chakra-ui/react';
+import { ChakraProvider, Spinner, Heading } from '@chakra-ui/react';
 import { IssuesList } from './components/IssuesList/IssuesList';
-import { AddIcon } from '@chakra-ui/icons';
 import { IssueContext, useIssueContext } from './IssueContext';
+import { NewIssueButton } from './components/NewIssue/NewIssueButton';
 
 function App() {
   const issueContext = useIssueContext();
@@ -13,9 +13,7 @@ function App() {
         <div className="App">
           <header className="App-header">
             <Heading>Ryan's Issue Tracker</Heading>
-            <Button className="App-new-issue-button" colorScheme="teal" leftIcon={<AddIcon />}>
-              New Issue
-            </Button>
+            <NewIssueButton />
           </header>
           <div className="App-container">
             {issueContext.allIssueIds != null ? (

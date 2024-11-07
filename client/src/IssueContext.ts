@@ -3,20 +3,28 @@ import { Issue } from './Issue';
 import { useToast } from '@chakra-ui/react';
 import axios from 'axios';
 
+export type CreateIssueParams = Pick<Issue, 'description' | 'title' | 'priority'>;
+
 interface IssueContextType {
   allIssueIds: Set<string> | undefined; // undefined if loading
   issuesById: { [issueId: string]: Issue | undefined };
-  setIssue: (issue: Issue) => Promise<void>;
+  /** Just setting locally in frontend state */
+  setIssue: (issue: Issue) => void;
+  createIssue: (issue: CreateIssueParams) => Promise<void>;
+  updateIssueStatus: (issueId: string, newStatus: Issue['status']) => Promise<void>;
   deleteIssue: (issueId: string) => Promise<void>;
 }
 
 export const IssueContext = createContext<IssueContextType>({
   allIssueIds: new Set(),
   issuesById: {},
-  setIssue: async () => void 0,
+  setIssue: () => void 0,
+  createIssue: async () => void 0,
+  updateIssueStatus: async () => void 0,
   deleteIssue: async () => void 0,
 });
 
+// TODO: break these out into separate files if context gets any larger
 export function useIssueContext(): IssueContextType {
   const toast = useToast();
   const [issuesById, setIssuesById] = useState<{ [issueId: string]: Issue }>({});
@@ -27,7 +35,6 @@ export function useIssueContext(): IssueContextType {
   useEffect(() => {
     pollTimer.current = setInterval(async () => {
       const response = await axios.get('http://localhost:8080/issues');
-      console.log('Get all issue ids', response);
       setAllIssueIds(new Set(response.data));
     }, 1_000);
 
@@ -43,12 +50,15 @@ export function useIssueContext(): IssueContextType {
       try {
         await axios.get(`http://localhost:8080/delete/${issueId}`);
         setIssuesById((prev) => {
-          delete prev[issueId];
-          return prev;
+          const next = { ...prev };
+          delete next[issueId];
+          return next;
         });
         setAllIssueIds((prev) => {
-          prev?.delete(issueId);
-          return prev;
+          if (!prev) return prev;
+          const next = new Set(prev);
+          next.delete(issueId);
+          return next;
         });
       } catch (e) {
         console.error(e);
@@ -63,24 +73,31 @@ export function useIssueContext(): IssueContextType {
     [toast],
   );
 
-  // Setting an issue
-  const setIssue = useCallback(
-    // Have this weird persist flag because the spec said to only support updating status in the BE endpoint
-    async (issue: Issue, persist?: boolean) => {
+  // Setting an issue locally
+  const setIssue = useCallback((issue: Issue) => {
+    setIssuesById((prev) => {
+      const next = { ...prev };
+      next[issue.id] = issue;
+      return next;
+    });
+  }, []);
+
+  // Updating an issue status
+  const updateIssueStatus = useCallback(
+    async (issueId: string, newStatus: Issue['status']) => {
       // TODO: optimistic update
       try {
-        if (persist) {
-          await axios.post('http://localhost:8080/update-status', { issueId: issue.id, newStatus: issue.status });
-        }
+        await axios.post('http://localhost:8080/update-status', { issueId, newStatus });
         setIssuesById((prev) => {
-          prev[issue.id] = issue;
-          return prev;
+          const next = { ...prev };
+          next[issueId] = { ...prev[issueId], status: newStatus };
+          return next;
         });
       } catch (e) {
         console.error(e);
         toast({
           title: 'Error',
-          description: 'Unable to update issue.',
+          description: 'Unable to update issue status.',
           status: 'error',
           isClosable: true,
         });
@@ -89,8 +106,34 @@ export function useIssueContext(): IssueContextType {
     [toast],
   );
 
+  // Creating a new issue
+  const createIssue = useCallback(
+    async (issue: CreateIssueParams) => {
+      // TODO: optimistic update
+      try {
+        const response = await axios.post('http://localhost:8080/create', issue);
+        setIssue(response.data);
+        setAllIssueIds((prev) => {
+          if (!prev) return new Set([response.data]);
+          const next = new Set(prev);
+          next.add(response.data);
+          return next;
+        });
+      } catch (e) {
+        console.error(e);
+        toast({
+          title: 'Error',
+          description: 'Unable to create issue.',
+          status: 'error',
+          isClosable: true,
+        });
+      }
+    },
+    [toast, setIssue],
+  );
+
   return useMemo(
-    () => ({ allIssueIds, issuesById, deleteIssue, setIssue }),
-    [allIssueIds, issuesById, deleteIssue, setIssue],
+    () => ({ allIssueIds, issuesById, createIssue, updateIssueStatus, deleteIssue, setIssue }),
+    [allIssueIds, issuesById, deleteIssue, createIssue, updateIssueStatus, setIssue],
   );
 }
