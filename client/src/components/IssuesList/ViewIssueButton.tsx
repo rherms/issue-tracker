@@ -26,13 +26,13 @@ interface ViewIssueButtonProps {
 export const ViewIssueButton = React.memo(function ViewIssueButton(props: ViewIssueButtonProps) {
   const { issue } = props;
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const context = useContext(IssueContext);
+  const { updateIssueStatus } = useContext(IssueContext);
 
   const handleStatusChange = useCallback(
     (evt: React.ChangeEvent<HTMLSelectElement>) => {
-      context.updateIssueStatus(issue.id, evt.currentTarget.value as Issue['status']);
+      updateIssueStatus(issue.id, evt.currentTarget.value as Issue['status']);
     },
-    [context.updateIssueStatus],
+    [updateIssueStatus, issue.id],
   );
 
   return (

@@ -25,15 +25,15 @@ export const NewIssueButton = React.memo(function NewIssueButton() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isCreating, setIsCreating] = useState<boolean>(false);
   const [createParams, setCreateParams] = useState<CreateIssueParams>(DEFAULT_PARAMS);
-  const context = useContext(IssueContext);
+  const { createIssue } = useContext(IssueContext);
 
   const handleCreateIssue = useCallback(async () => {
     setIsCreating(true);
-    await context.createIssue(createParams);
+    await createIssue(createParams);
     onClose();
     setCreateParams(DEFAULT_PARAMS);
     setIsCreating(false);
-  }, [context.createIssue, createParams, onClose]);
+  }, [createIssue, createParams, onClose]);
 
   return (
     <>
