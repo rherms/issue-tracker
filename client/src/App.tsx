@@ -15,7 +15,7 @@ function App() {
             <Heading>Ryan's Issue Tracker</Heading>
             <NewIssueButton />
           </header>
-          <div className="App-container">
+          <div className={`App-container ${issueContext.allIssueIds == null ? 'loading' : ''}`}>
             {issueContext.allIssueIds != null ? (
               <IssuesList issueIds={issueContext.allIssueIds} />
             ) : (

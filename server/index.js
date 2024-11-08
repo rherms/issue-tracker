@@ -73,6 +73,7 @@ app.post('/update-status', (req, res) => {
     res.sendStatus(404);
   }
   ALL_ISSUES_BY_ID[id].status = newStatus;
+  ALL_ISSUES_BY_ID[id].lastUpdatedTimestampMs = Date.now();
   res.send(ALL_ISSUES_BY_ID[id]);
 });
 
