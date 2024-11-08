@@ -12,10 +12,14 @@ function App() {
       <IssueContext.Provider value={issueContext}>
         <div className="App">
           <header className="App-header">
-            <Heading>Ryan's Issue Tracker</Heading>
+            <Heading mb="3">Ryan's Issue Tracker</Heading>
             <NewIssueButton />
           </header>
-          <div className={`App-container ${issueContext.allIssueIds == null ? 'loading' : ''}`}>
+          <div
+            className={`App-container ${
+              issueContext.allIssueIds == null || issueContext.allIssueIds.size === 0 ? 'empty' : ''
+            }`}
+          >
             {issueContext.allIssueIds != null ? (
               <IssuesList issueIds={issueContext.allIssueIds} />
             ) : (
