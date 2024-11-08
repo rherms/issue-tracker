@@ -10,7 +10,7 @@ a web application for tracking issues.
 1. Clone the repository
 2. Ensure you are running Node 18+ ([NVM](https://github.com/nvm-sh/nvm) can help here)
 3. `cd` into the top level `server` directory and run `npm install` to install backend dependencies
-4. `cd` into the top level `client` directory and run `npm install to install frontend dependencies
+4. `cd` into the top level `client` directory and run `npm install` to install frontend dependencies
 
 ### Developing
 
