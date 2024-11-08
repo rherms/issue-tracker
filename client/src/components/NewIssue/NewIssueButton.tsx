@@ -15,20 +15,24 @@ import { CreateIssueParams, IssueContext } from '../../IssueContext';
 import { Priority } from '../../const';
 import { NewIssueForm } from './NewIssueForm';
 
+const DEFAULT_PARAMS: CreateIssueParams = {
+  title: '',
+  description: '',
+  priority: Priority.Medium,
+};
+
 export const NewIssueButton = React.memo(function NewIssueButton() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isCreating, setIsCreating] = useState<boolean>(false);
-  const [createParams, setCreateParams] = useState<CreateIssueParams>({
-    title: '',
-    description: '',
-    priority: Priority.Medium,
-  });
+  const [createParams, setCreateParams] = useState<CreateIssueParams>(DEFAULT_PARAMS);
   const context = useContext(IssueContext);
 
   const handleCreateIssue = useCallback(async () => {
     setIsCreating(true);
     await context.createIssue(createParams);
     onClose();
+    setCreateParams(DEFAULT_PARAMS);
+    setIsCreating(false);
   }, [context.createIssue, createParams, onClose]);
 
   return (

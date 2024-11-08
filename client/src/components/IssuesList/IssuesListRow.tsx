@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useCallback, useContext } from 'react';
 import { useIssue } from '../../hooks/useIssue';
-import { AlertIcon, Skeleton, Td, Tr } from '@chakra-ui/react';
+import { HStack, IconButton, Skeleton, Td, Tooltip, Tr } from '@chakra-ui/react';
 import { Priority } from '../../const';
-import { WarningTwoIcon } from '@chakra-ui/icons';
+import { DeleteIcon, WarningTwoIcon } from '@chakra-ui/icons';
+import { IssueContext } from '../../IssueContext';
+import { ViewIssueButton } from './ViewIssueButton';
+import { renderPriority } from '../../utils/renderPriority';
 
 interface IssuesListRowProps {
   issueId: string;
@@ -11,6 +14,11 @@ interface IssuesListRowProps {
 export const IssuesListRow = React.memo(function IssuesListRow(props: IssuesListRowProps) {
   const { issueId } = props;
   const issue = useIssue(issueId);
+  const context = useContext(IssueContext);
+
+  const handleDelete = useCallback(() => {
+    context.deleteIssue(issueId);
+  }, [context.deleteIssue, issueId]);
 
   if (issue == null) {
     return (
@@ -19,19 +27,13 @@ export const IssuesListRow = React.memo(function IssuesListRow(props: IssuesList
           <Skeleton>XXXXX</Skeleton>
         </Td>
         <Td>
-          <Skeleton>XXXXXXXXXX XXXXXXXXXXX</Skeleton>
+          <Skeleton>XXX</Skeleton>
         </Td>
         <Td>
           <Skeleton>XXXXX</Skeleton>
         </Td>
         <Td>
-          <Skeleton>XXXXX</Skeleton>
-        </Td>
-        <Td>
-          <Skeleton>XXXXXXXXX</Skeleton>
-        </Td>
-        <Td>
-          <Skeleton>XXXXXXXXX</Skeleton>
+          <Skeleton>XX XX</Skeleton>
         </Td>
       </Tr>
     );
@@ -40,15 +42,24 @@ export const IssuesListRow = React.memo(function IssuesListRow(props: IssuesList
   return (
     <Tr>
       <Td>{issue.title}</Td>
-      <Td>{issue.description}</Td>
       <Td>{issue.status}</Td>
+      <Td>{renderPriority(issue.priority)}</Td>
       <Td>
-        {issue.priority}
-        {issue.priority === Priority.High && <WarningTwoIcon ml="2" color="orange" />}
+        <HStack>
+          <ViewIssueButton issue={issue} />
+          {/* TODO: delete confirmation modal */}
+          <Tooltip label="Delete Issue">
+            <IconButton
+              aria-label="delete-issue"
+              color="red.500"
+              variant="ghost"
+              icon={<DeleteIcon />}
+              title="Delete Issue"
+              onClick={handleDelete}
+            />
+          </Tooltip>
+        </HStack>
       </Td>
-      <Td>{new Date(issue.createTimestampMs).toLocaleString()}</Td>
-      {/* TODO: show something like "5 minutes ago" */}
-      <Td>{new Date(issue.lastUpdatedTimestampMs).toLocaleString()}</Td>
     </Tr>
   );
 });

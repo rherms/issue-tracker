@@ -19,7 +19,6 @@ export function useIssue(issueId: string): Issue | undefined {
       if (!context.issuesById[issueId]) {
         const response = await axios.get(`http://localhost:8080/issue/${issueId}`);
         if (isCancelled) return;
-        console.log(response);
         context.setIssue(response.data);
       }
     }

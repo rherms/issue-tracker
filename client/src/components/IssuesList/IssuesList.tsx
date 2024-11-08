@@ -17,11 +17,9 @@ export const IssuesList = React.memo(function IssuesList(props: IssuesListProps)
         <Thead>
           <Tr>
             <Th>Title</Th>
-            <Th>Description</Th>
             <Th>Status</Th>
             <Th>Priority</Th>
-            <Th>Created</Th>
-            <Th>Last Updated</Th>
+            <Th>Actions</Th>
           </Tr>
         </Thead>
         <Tbody>

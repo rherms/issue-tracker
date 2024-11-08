@@ -87,7 +87,7 @@ export function useIssueContext(): IssueContextType {
     async (issueId: string, newStatus: Issue['status']) => {
       // TODO: optimistic update
       try {
-        await axios.post('http://localhost:8080/update-status', { issueId, newStatus });
+        await axios.post('http://localhost:8080/update-status', { id: issueId, newStatus });
         setIssuesById((prev) => {
           const next = { ...prev };
           next[issueId] = { ...prev[issueId], status: newStatus };
@@ -114,9 +114,10 @@ export function useIssueContext(): IssueContextType {
         const response = await axios.post('http://localhost:8080/create', issue);
         setIssue(response.data);
         setAllIssueIds((prev) => {
-          if (!prev) return new Set([response.data]);
+          const issueId = (response.data as Issue).id;
+          if (!prev) return new Set([issueId]);
           const next = new Set(prev);
-          next.add(response.data);
+          next.add(issueId);
           return next;
         });
       } catch (e) {
